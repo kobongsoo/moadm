@@ -1,0 +1,27 @@
+# 환경 관련
+LOG_PATH: './log/test'  # 로그경로
+SEED: 111               # **seed 값 (**변경하면, 기존 임베딩벡터값과 다른 값이 나옴)
+
+# Chunk 인자
+CHUNK_SIZE: 500        # Chunk 사이즈
+CHUNK_OVERLAP: 50      # Chunk 오버랩 사이즈
+
+EMBEDDING_MODEL: "bongsoo/kpf-sbert-128d-v1"
+
+ES_URL: "https:xxxx:xxxx"    # es 8.x 일때는 앞에 https:// 붙여줘야 함. 
+#ES_API_KEY: "bxxxx=="  # demo서버
+ES_API_KEY: "dxxxx=="  # gpu서버
+ES_INDEX_FILE_PATH: "./data/es_index/mpower10u_128d_1_keword.json"
+ES_BATCH_SIZE: 100
+
+# 벡터 검색 및 클러스터링
+SEARCH_EMBED_TYPE: 1 # 임베딩 검색 방식 : 0=다대다: 클러스터링 임베딩 검색(mean), 1=일대일:평균 임베딩 검색, 2=1:일대다:평균 임베딩 검색
+SEARCH_K: 3        # 검색 계수
+FLOAT_TYPE : "float16" # 클러스터링 할때 벡터 타입(float32, float16)
+EMBEDDING_SEARCH_MIN_SCORE: 0.0 # 임베딩 검색시 최소 스코어 
+
+# RRF 검색 적용 유무.=>임베딩 검색 + BM25
+RRF_SEARCH: 1                   # 0=임베딩 검색만 적용, 1=RRF(BM25+벡터검색) 검색 적용, 2=BM25만 적용
+BM25_SEARCH_MIN_SCORE: 0.0      # BM25 검색시 최소 스코어(*이스코어 이하는 검색안함)
+RRF_BM25_WEIGTH : 0.8           # BM25 가중치(EMBED와 합쳐서 2가되어야 함)
+RRF_EMBED_WEIGTH: 1.2           # EMBED 가중치

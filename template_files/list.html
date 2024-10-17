@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG User Doc Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        .input-container {
+            margin: 10px 0;
+        }
+
+        #userId {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #data-container {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .delete-button-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+		.hidden {
+            display: none;
+        }
+    </style>
+	<script>
+        window.onload = function() {
+            // 현재 URL 전체를 가져옵니다.
+            var fullURL = window.location.href;
+
+            // URL의 프로토콜 (http: 또는 https:)를 가져옵니다.
+            var protocol = window.location.protocol;
+
+            // URL의 호스트 (도메인과 포트 포함)을 가져옵니다.
+            var host = window.location.host;
+
+            // URL의 도메인을 가져옵니다.
+            var hostname = window.location.hostname;
+
+            // URL의 포트를 가져옵니다.
+            var port = window.location.port;
+
+            // 결과를 콘솔에 출력합니다.
+            console.log("Full URL: " + fullURL);
+            console.log("Protocol: " + protocol);
+            console.log("Host: " + host);
+            console.log("Hostname: " + hostname);
+            console.log("Port: " + port);
+
+            // 결과를 HTML에 표시합니다.
+            document.getElementById("fullURL").textContent = fullURL;
+            document.getElementById("protocol").textContent = protocol;
+            document.getElementById("host").textContent = host;
+            document.getElementById("hostname").textContent = hostname;
+            document.getElementById("port").textContent = port;
+        };
+    </script>
+    <script>
+        async function fetchData() {
+            const userId = document.getElementById("userId").value;
+			//const hostname = document.getElementById("hostname").textContent;
+			//const port = document.getElementById("port").textContent;
+			//const protocol = document.getElementById("protocol").textContent;
+
+			if (!userId) {
+				alert('UserID 를 입력해 주세요');
+				return;
+			}
+			//const url = port ? `${protocol}://${hostname}:${port}/list/search?user_id=${userId}` : `${protocol}://${hostname}/list/search?user_id=${userId}`;
+
+			const url = `/list/search?user_id=${userId}`; //*앞에 url 붙일필요없이 /경로만 적어주면 됨.
+			console.log(url);
+			const response = await fetch(url)
+            //const response = await fetch(`http://${hostname}:${port}/list/search?user_id=${userId}`);
+            const data = await response.json();
+            
+            // Add console.log to debug data
+            console.log(data);
+
+            const fields = data[0];
+            const counts = data[1];
+            
+            const container = document.getElementById("data-container");
+            container.innerHTML = "";
+
+            const deleteButtonContainer = document.createElement("div");
+            deleteButtonContainer.className = "delete-button-container";
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "선택삭제";
+            deleteButton.onclick = deleteSelectedFields;
+            deleteButtonContainer.appendChild(deleteButton);
+            container.appendChild(deleteButtonContainer);
+
+            const table = document.createElement("table");
+            const thead = document.createElement("thead");
+            const tr = document.createElement("tr");
+            const th1 = document.createElement("th");
+            th1.innerText = "문서명";
+            const th2 = document.createElement("th");
+            th2.innerText = "벡터계수";
+            const th3 = document.createElement("th");
+
+			// 전체체크 checkbox 추가
+            const selectAllCheckbox = document.createElement("input");
+            selectAllCheckbox.type = "checkbox";
+            selectAllCheckbox.id = "select_all";
+            selectAllCheckbox.onclick = function() {
+                const checkboxes = document.getElementsByName("field_checkbox");
+                for (const checkbox of checkboxes) {
+                    checkbox.checked = selectAllCheckbox.checked;
+                }
+            };
+            th3.appendChild(selectAllCheckbox);
+            const selectAllLabel = document.createElement("label");
+            selectAllLabel.htmlFor = "select_all";
+            //selectAllLabel.innerText = "전체체크";
+            th3.appendChild(selectAllLabel);
+
+            //th3.innerText = "";
+            tr.appendChild(th3);
+            tr.appendChild(th1);
+            tr.appendChild(th2);
+            thead.appendChild(tr);
+            table.appendChild(thead);
+
+            const tbody = document.createElement("tbody");
+            for (let i = 0; i < fields.length; i++) {
+                const field = fields[i];
+                const count = counts[i];
+
+                const tr = document.createElement("tr");
+                const tdCheckbox = document.createElement("td");
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `field_${i}`;
+                checkbox.name = "field_checkbox";
+                checkbox.value = field;
+                tdCheckbox.appendChild(checkbox);
+
+                const tdField = document.createElement("td");
+                tdField.innerText = field;
+
+                const tdCount = document.createElement("td");
+                tdCount.innerText = count;
+
+                tr.appendChild(tdCheckbox);
+                tr.appendChild(tdField);
+                tr.appendChild(tdCount);
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        async function deleteSelectedFields() {
+			//const hostname = document.getElementById("hostname").textContent;
+			//const port = document.getElementById("port").textContent;
+
+			const userId = document.getElementById("userId").value;
+            const checkboxes = document.querySelectorAll('input[name="field_checkbox"]:checked');
+            const deleteFields = Array.from(checkboxes).map(cb => cb.value);
+
+			const url = `/list/del?user_id=${userId}`; //*앞에 url 붙일필요없이 /경로만 적어주면 됨.
+			console.log(url);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fields: deleteFields })
+            });
+            
+            if (response.ok) {
+                alert("삭제가 완료되었습니다.");
+                fetchData(); // Reload data
+            } else {
+                alert("삭제에 실패하였습니다.");
+            }
+        }
+
+		function openUploadPopup() {
+			const hostname = document.getElementById("hostname").textContent;
+			const port = document.getElementById("port").textContent;
+
+            const userId = document.getElementById("userId").value;
+            const popupUrl = `http://${hostname}:${port}/upload/file?user_id=${userId}`;
+			if (!userId) {
+				alert('UserID 를 입력해 주세요');
+				return;
+			}
+
+			if (userId=='*.*') {
+				alert('*.* UserID는 등록할 수 없습니다.다른 UserID를 입력해 주세요');
+				return;
+			}
+            window.open(popupUrl, '파일 등록', 'width=600,height=400');
+        }
+
+		function openSearchPopup() {
+			const hostname = document.getElementById("hostname").textContent;
+			const port = document.getElementById("port").textContent;
+
+            const userId = document.getElementById("userId").value;
+            const popupUrl = `http://${hostname}:${port}/search?user_id=${userId}`;
+			if (!userId) {
+				alert('UserID 를 입력해 주세요');
+				return;
+			}
+            window.open(popupUrl, '검색', 'width=800, height=1000');
+        }
+    </script>
+</head>
+<body>
+		<!--ip, port 정보를 숨김-->
+		<p id="fullURL" class="hidden"></p>
+		<p id="protocol" class="hidden"></p>
+		<p id="host" class="hidden"></p>
+		<p id="hostname" class="hidden"></p>
+		<p id="port" class="hidden"></p>
+
+    <h1>RAG User Doc Management</h1>
+    <div class="input-container">
+        <label for="user_id">User ID:</label>
+        <input type="text" id="userId" value="{{user_id}}">
+        <button onclick="fetchData()">조회</button>
+		<button onclick="openUploadPopup()">등록</button>
+		<button onclick="openSearchPopup()">검색</button>
+    </div>
+    <div id="data-container"></div>
+</body>
+</html>

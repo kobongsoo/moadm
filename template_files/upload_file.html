@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 파일 올리기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .file-input-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+	<style>
+         .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 80%;
+        }
+        h2 {
+            color: #333;
+        }
+        .file-input-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .user-id {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        #upload-message {
+            display: none;
+            font-size: 1.1em;
+            color: #0066cc;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var msg = "{{msg}}";
+            if (msg.trim() !== "") {
+                alert(msg);
+            }
+
+            var form = document.querySelector("form");
+            var fileInput = document.getElementById("file");
+            var uploadMessage = document.getElementById("upload-message");
+            var counter = 0;
+            var counterInterval;
+
+            form.addEventListener("submit", function(event) {
+                if (fileInput.files.length > 0) {
+                    uploadMessage.style.display = "block";
+                    uploadMessage.innerHTML = "파일 업로드 중입니다...잠시만 기다려 주십시오 (0s)";
+                    counter = 0;
+                    counterInterval = setInterval(function() {
+                        counter++;
+                        uploadMessage.innerHTML = "파일 업로드 중입니다...잠시만 기다려 주십시오 (" + counter + "s)";
+                    }, 1000);
+                }
+            });
+
+            form.addEventListener("ajax:complete", function(event) {
+                uploadMessage.style.display = "none";
+                clearInterval(counterInterval);
+            });
+        });
+    </script>
+    <div class="container">
+        <span class="user-id">🧒 사용자 ID: {{ user_id[:35] }}</span>
+        <h2>Upload PDF File</h2>
+        <div id="upload-message">파일 업로드 중입니다...잠시만 기다려 주십시오</div>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="file-input-container">
+                <input type="file" name="file" id="file" accept=".pdf">
+            </div>
+            <input type="hidden" name="user_id" value="{{user_id}}">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html>

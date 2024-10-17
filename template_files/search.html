@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .chat-container {
+            width: 95%;
+            max-width: 800px;
+			max-height: 900px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .chat-box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 1024px;
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message.user {
+            background-color: #e1ffc7;
+            align-self: flex-end;
+        }
+        .message.gpt {
+            background-color: #e0e0e0;
+        }
+        .button-container {
+            display: flex;
+			gap: 10px; /* 두 버튼 사이의 간격을 10px로 설정 */
+            justify-content: center;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+		.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+	<!--ip, port 정보를 숨김-->
+	<p id="hostname" class="hidden"></p>
+	<p id="port" class="hidden"></p>
+
+    <div class="chat-container">
+        <div class="input-container">
+		    <span class="userId">🧒 파일명: {{ user_id[:35] }}</span>
+            <input type="hidden" id="userId" placeholder="Enter your User ID" value="{{user_id}}">
+            <input type="text" id="userQuestion" placeholder="Enter your question">
+        </div>
+		<div class="button-container">
+			<button id="searchBtn">검색</button>
+            <button id="newChatBtn">검색목록 초기화</button>
+        </div>
+		<br>
+        <div class="chat-box" id="chatBox"></div>
+    </div>
+
+	<script>
+        window.onload = function() {
+
+            // URL의 도메인을 가져옵니다.
+            var hostname = window.location.hostname;
+
+            // URL의 포트를 가져옵니다.
+            var port = window.location.port;
+
+            // 결과를 콘솔에 출력합니다.
+            console.log("Hostname: " + hostname);
+            console.log("Port: " + port);
+
+            // 결과를 HTML에 표시합니다.
+            document.getElementById("hostname").textContent = hostname;
+            document.getElementById("port").textContent = port;
+        };
+    </script>
+    <script>
+       async function handleSearch() {
+			const hostname = document.getElementById("hostname").textContent;
+			const port = document.getElementById("port").textContent;
+			const userId = document.getElementById('userId').value;
+			const userQuestion = document.getElementById('userQuestion').value;
+			if (!userId || !userQuestion) return;
+
+			// Add user question to chat box
+			const userMessage = document.createElement('div');
+			userMessage.classList.add('message', 'user');
+			userMessage.textContent = `Q: ${userQuestion}`;
+			document.getElementById('chatBox').appendChild(userMessage);
+
+			// Clear the question input
+			document.getElementById('userQuestion').value = '';
+
+			try {
+				// Simulate sending the question to GPT and getting a response
+				// 3가지 값 = 응답결과, 검색결과, 에러코드 리턴됨.
+				const gptResponse = await getGptResponse(userId, userQuestion, hostname, port);
+
+				// Add GPT response to chat box and display it character by character
+				const gptMessage = document.createElement('div');
+				gptMessage.classList.add('message', 'gpt');
+				document.getElementById('chatBox').appendChild(gptMessage);
+
+				gptMessage.innerHTML = 'AI:<br>';
+				gptMessage.innerHTML += gptResponse[0] + ' <button class="view-more">내용보기</button><br>';
+
+				const searchContent = document.createElement('div');
+				searchContent.classList.add('search-content');
+				searchContent.style.display = 'none';
+				searchContent.innerHTML = gptResponse[1] + '<br>';
+
+				document.getElementById('chatBox').appendChild(gptMessage);
+				document.getElementById('chatBox').appendChild(searchContent);
+
+				gptMessage.querySelector('.view-more').addEventListener('click', function() {
+					if (searchContent.style.display === 'none') {
+						searchContent.style.display = 'block';
+						this.textContent = '내용숨기기';
+					} else {
+						searchContent.style.display = 'none';
+						this.textContent = '내용보기';
+					}
+				});
+
+			} catch (error) {
+				console.error('Error fetching GPT response:', error);
+			}
+
+			// Scroll to the bottom of the chat box
+			document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+		}
+
+        async function getGptResponse(userId, question, hostname, port) {
+			
+			const url = `/search/query?user_id=${encodeURIComponent(userId)}&query=${encodeURIComponent(question)}`; //*앞에 url 붙일필요없이 /경로만 적어주면 됨.
+            let response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            data = await response.json();
+            return data
+        }
+
+		document.getElementById('userQuestion').addEventListener('keydown', function(event) {
+			if (event.key === 'Enter') {
+				handleSearch();
+			}
+		});
+
+		document.getElementById('searchBtn').addEventListener('click', handleSearch);
+
+        document.getElementById('newChatBtn').addEventListener('click', function() {
+            // Clear the chat box
+            document.getElementById('chatBox').innerHTML = '';
+        });
+    </script>
+</body>
+</html>
+
+
+
