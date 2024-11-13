@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>upload test</title>
     <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+        }
         /* 테이블 스타일 */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         /* 테이블 헤더 스타일 */
@@ -17,12 +20,14 @@
             color: white;
             padding: 10px;
             text-align: left;
+            font-size: 15px; /* 폰트 크기 설정 */
         }
 
         /* 테이블 데이터 셀 스타일 */
         td {
             padding: 10px;
             border: 1px solid #ddd;
+            font-size: 15px; /* 폰트 크기 설정 */
         }
 
         /* 행에 마우스를 올릴 때 */
@@ -40,45 +45,30 @@
             background-color: #4CAF50;
             color: white;
         }
-        /* 총계수 스타일 */
-        #total-count {
-            font-size: 17px;
-            color: #4CAF50;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-family: 'Arial', sans-serif;
-        }
+
         /* 내용요약 스타일 */
         #doc-answer {
-            font-size: 17px;
+            font-size: 16px;
             color: #255fb6;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-family: 'Arial', sans-serif;
+            margin-bottom: 15px;
+            font-family: 'Malgun Gothic', sans-serif;
+            border: 1px solid #ddd;
+            padding: 10px;
         }
         /* 처리시간 스타일 */
         #total-time {
-            font-size: 17px;
-            color: #aa5c28;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-family: 'Arial', sans-serif;
+            font-size: 15px;
+            color: #0c0501;
+            margin-bottom: 15px;
+            font-family: 'Malgun Gothic', sans-serif;
         }
         /* 문서파일명 스타일 */
         #doc-filename {
-            font-size: 22px;
+            font-size: 20px;
             color: #080400;
             font-weight: bold;
-            margin-bottom: 20px;
-            font-family: 'Arial', sans-serif;
-        }
-		/* 로컬폴더 스타일 */
-        #local-folder {
-            font-size: 17px;
-            color: #aa5c28;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-family: 'Arial', sans-serif;
+            margin-bottom: 15px;
+            font-family: 'Malgun Gothic', sans-serif;
         }
         button {
             padding: 10px 20px;
@@ -88,29 +78,29 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-family: 'Malgun Gothic', sans-serif;
         }
     </style>
     <script>
         window.onload = function() {
 
             // 파일네임 출력
-            const filename = "{{filename}}"
+            const filename = "📌 "+"{{filename}}"
             document.getElementById("doc-filename").innerHTML = filename;
 
-            // 시간 출력
+            // 시간 과 폴더경로 출력
             const time = "{{time}}"
-            document.getElementById("total-time").innerHTML = "*처리시간: " + time + " 초";
+            // 로컬파일이 있는 폴더경로 얻어옴.
+			const local_folder_path = "{{local_folder_path}}" + "/";
+            document.getElementById("total-time").innerHTML = "⏰: " + time + " 초, 📂: " + local_folder_path;
             
             // 내용요약을 출력
             const answer = "{{answer}}"
-            document.getElementById("doc-answer").innerHTML = "*내용요약: <br>" + answer;
+            document.getElementById("doc-answer").innerHTML = answer;
 
-			// 로컬파일이 있는 폴더경로 얻어옴.
-			const local_folder_path = "{{local_folder_path}}" + "/";
-			document.getElementById("local-folder").innerHTML = "*로컬폴더경로: " + local_folder_path;
-
+			
             // {response} 값을 입력 받음. 
             //  예:[{&#39;rfile_name&#39;: &#39;1.위임전결규정표.txt&#39;, &#39;score&#39;: 1.75}, {&#39;rfile_name&#39;: &#39;5_출퇴근 시스템.txt&#39;, &#39;score&#39;: 1.6475}]
             const responseStr = "{{response}}"
@@ -120,20 +110,36 @@
             const responseJSON = responseStr.replace(/&#39;/g, "'").replace(/'/g, '"');
             const response = JSON.parse(responseJSON);
 
-            // 총계수 출력
-            const totalCount = response.length;
-            document.getElementById("total-count").innerHTML = "*유사문서: " + totalCount;
-            
-
             // 파싱된 값을 테이블 형식으로 출력
             let output = "<table border='1' cellpadding='5' cellspacing='0'>";
-            output += "<tr><th>순번</th><th>문서</th><th>유사도</th></tr>";
+            output += "<tr><th>문서</th><th>유사도</th></tr>";
             response.forEach((item, index) => {
                 output += "<tr>";
-                output += "<td>" + (index + 1) + "</td>";  // 순번 출력 (1부터 시작)
-                //output += "<td>" + item.rfile_name + "</td>";
-				// 파일명을 클릭하면 해당 파일로 이동하도록 링크 생성
-				output += "<td><a href='"+ local_folder_path + encodeURIComponent(item.rfile_name) + "' target='_blank'>" + item.rfile_name + "</a></td>";
+                
+                // 파일 확장자에 따라 아이콘 결정
+                let fileIcon = "";
+                const fileExtension = item.rfile_name.split('.').pop().toLowerCase();
+                switch (fileExtension) {
+                    case 'txt':
+                        fileIcon = "📙"; // 텍스트 파일 아이콘
+                        break;
+                    case 'pdf':
+                        fileIcon = "📗"; // PDF 파일 아이콘
+                        break;
+                    case 'doc':
+                    case 'docx':
+                        fileIcon = "📘"; // 워드 파일 아이콘
+                        break;
+                    case 'ppt':
+                    case 'pptx':
+                        fileIcon = "📕";  // 파워 포인트 아이콘
+                        break;
+                    default:
+                        fileIcon = "📄"; // 기본 파일 아이콘
+                }
+
+                // 파일명을 클릭하면 해당 파일로 이동하도록 링크 생성
+                output += "<td>" + fileIcon + "<a href='"+ local_folder_path + encodeURIComponent(item.rfile_name) + "' target='_blank'>" + item.rfile_name + "</a></td>";
                 output += "<td>" + item.score + "</td>";
                 output += "</tr>";
             });
@@ -155,14 +161,14 @@
 </head>
 <body>
     <div id="doc-filename"></div> <!--파일명-->
-    <div class="input-container"></div>
-        <button onclick="openSearchPopup()">RAG Q&A</button>
-    </div>
-    
-    <div id="total-time"></div> <!-- 시간 -->
+    <div id="total-time"></div> <!-- 시간, 폴더경로 -->
     <div id="doc-answer"></div> <!-- gpt 문서 요약 -->
-	<div id="local-folder"></div> <!-- 로컬 폴더 출력 부분 -->
-    <div id="total-count"></div> <!-- 총계수 출력 부분 -->
     <div id="docs-manager"></div> <!--표 출력부분-->
+    <!-- CHAT 버튼(챗봇)-->
+    <div class="input-container"></div>
+        <div style="text-align: center;">
+            <button style="width: 400px;" onclick="openSearchPopup()">CHAT</button>
+        </div></div>
+    </div>
 </body>
 </html>
