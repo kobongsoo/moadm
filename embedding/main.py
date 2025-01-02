@@ -11,7 +11,9 @@ from langchain_community.embeddings import (
 )
 
 ##langchain ######################
-from langchain.document_loaders import TextLoader, PyPDFLoader
+from langchain_community.document_loaders.pdf import PyPDFLoader
+from langchain_community.document_loaders.text import TextLoader
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 ##################################
 
