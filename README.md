@@ -32,7 +32,7 @@ transformers                             4.46.3
 sh moadm.sh start
 ```
 - ip:9003 접속
-- 
+
 ![image](https://github.com/user-attachments/assets/76c74a3e-6cd6-4b7d-be93-29605ea4a1b7)
 
 ## 테스트 
@@ -50,4 +50,3 @@ sh moadm.sh start
 
 ![image](https://github.com/user-attachments/assets/7de281a9-9c0c-4d3b-9944-e0f78a6866d6)
 
-7. 
