@@ -3,15 +3,16 @@
 ## 실행환경
 - elasticsearch 8.x 구동중이어야 함.
 - text 추출을 위한 MpowerAI 설치되어 있어야 함.
+- sLLM 모델 연동은 ollama API 이용. 따라서 [ollama가 설치 및 구동](https://github.com/ollama/ollama)되어 있어야 함.
 - 기타 주요 패키지
 ```
-$ pip list | grep -E "transformer|elastic|fastapi|langchain|googletrans|httpcore"
+$ pip list | grep -E "transformer|elastic|fastapi|langchain|googletrans|httpcore|ollama"
 
 elastic-transport                        8.0.1
 elasticsearch                            7.17.0
 fastapi                                  0.104.1
 googletrans                              4.0.0rc1
-httpcore                                 0.9.1
+httpcore                                 1.0.7
 langchain                                0.3.13
 langchain-community                      0.3.13
 langchain-core                           0.3.28
@@ -21,10 +22,12 @@ langchain-groq                           0.2.1
 langchain-openai                         0.1.6
 langchain-text-splitters                 0.3.4
 langchainhub                             0.1.15
+ollama                                   0.4.5
 opentelemetry-instrumentation-fastapi    0.45b0
 pytorch-transformers                     1.2.0
 sentence-transformers                    2.2.2
 transformers                             4.46.3
+
 ```
 ## 실행방법
 - sh 명령어로 실행. Port는 **9003** 임
