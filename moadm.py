@@ -16,14 +16,14 @@ from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile, Query, Cookie, Form, Request, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
-from utils import MyUtils, delete_local_file, generate_random_string, generate_text_GPT2, weighted_reciprocal_rank_fusion
+from utils import MyUtils, delete_local_file, generate_random_string, generate_text_GPT2, generate_text_ollama, weighted_reciprocal_rank_fusion
 from langchain_community.embeddings import HuggingFaceEmbeddings, HuggingFaceBgeEmbeddings
 from docs_func import mpower_save_docs, embedding_file_list_doc, search_docs, embedding_file_doc
 from es_8 import My_ElasticSearch
 
 from docs_func import check_mime_type, getfilePath_doc01, extract_save_doc01
 
-from vision import MY_Vision
+#from vision import MY_Vision
 
 # settings.yaml 설정값 불러옴.
 myutils = MyUtils(yam_file_path='./data/docs_settings.yaml')
@@ -67,9 +67,12 @@ shaai = MShaAI()
 #---------------------------------------------------------------
 
 # vision 모델 로딩
+'''
 myvision = MY_Vision(model_folder_path=settings['VISION_MODEL'], device=settings['VISION_DEVICE'])
 print(f'*Vision모델: {settings["VISION_MODEL"]}')   
 print(f'*myvision: {myvision}')
+'''
+myvision = ""
 #-----------------------------------------------
 
 # GPT 모델 - GPT 3.5 Turbo 지정 : => 모델 목록은 : https://platform.openai.com/docs/models/gpt-4 참조                                                
@@ -376,6 +379,11 @@ async def dm_upload_search(request: Request,
         prompt = prompt_context.format(query=query, context=file_content) # query에는 요약해달는 prompt, context에는 파일내용.
         #myutils.log_message(f'[/upload/es/{esindex}/search] search_docs\r\nprompt:{prompt}')  
 
+        # ollama 이용..
+        answer, error = generate_text_ollama(sllm_model=gpt_model, prompt=prompt) 
+    
+        # gpt 이용
+        '''
         answer, error = generate_text_GPT2(gpt_model=gpt_model,
                                            prompt=prompt,
                                            stream=settings['GPT_STREAM'],
@@ -383,6 +391,7 @@ async def dm_upload_search(request: Request,
                                            temperature=settings['GPT_TEMPERATURE'],
                                            top_p=settings['GPT_TOP_P']
                                           )
+        '''
         myutils.log_message(f'[/upload/es/{esindex}/search] generate_text_GPT2\r\nanswer:{answer}, error:{error}')  
     else: # 이미지가 입력된 경우에는 ImageToText를 담음.
         answer = ImageToText
@@ -506,9 +515,15 @@ async def search01(request:Request, user_id:str, query:str):
     myutils.log_message(f'\n[info][/search] *promptp:{prompt}\n')
         
     # 4.GPT로 쿼리
+    # ollama 이용..
+    response, status = generate_text_ollama(sllm_model=gpt_model, prompt=prompt, system_prompt=system_prompt) 
+    
+    # chatgpt 이용..
+    '''
     response, status = generate_text_GPT2(gpt_model=gpt_model, prompt=prompt, system_prompt=system_prompt, 
                                           assistants=[], stream=stream, timeout=20,
                                           max_tokens=max_tokens, temperature=temperature, top_p=top_p) 
+    '''
     
     myutils.log_message(f'\n[info][/search] *generate_text_GPT2=>status:{status}\nresponse:\n{response}\n')
     myutils.log_message(f'========================================')

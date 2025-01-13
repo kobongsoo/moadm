@@ -13,8 +13,54 @@ import google.generativeai as genai
 from requests.exceptions import Timeout
 from functools import lru_cache  # 캐싱
 
+# [2025-01-10] pip install ollama 설치
+from ollama import Client
+
 # 캐싱을 위한 256 데코레이터 설정
 #@lru_cache(maxsize=256)  
+
+#[2025-01-10] ollama 모델 이용.
+def generate_text_ollama(sllm_model:str, prompt:str, 
+                         system_prompt:str="", host:str="http://localhost:11434"):
+    error = 0
+    answer:str = ""
+    messages:list = []
+    start_time = time.time()
+    
+    # 메시지 설정
+    if len(system_prompt) > 0:
+        messages.append( {"role": "system", "content": system_prompt} )
+      
+    if len(prompt) > 0:
+        messages.append( {"role": "user", "content": prompt} )
+    
+    print(f'[generate_text_ollama]\r\nmessages={messages}')
+    
+    try:
+            
+        client = Client(host=host, headers={'x-some-header': 'some-value'})
+        
+        print(f'[generate_text_ollama]\r\client={client}')
+        
+        response = client.chat(model=sllm_model, messages=messages,)
+        
+        #print(f'[generate_text_ollama]\r\response={response}')
+        
+        answer=response.message.content
+        
+        answer = answer.replace("\n", "")  # 줄밬꿈 문자를 제거
+        
+        return answer, error
+    except Timeout:
+        answer = f'The request timed out.=>max:{timeout}'
+        error = 1001
+        return answer, error
+    except Exception as e:
+        answer = f"Error in API request: {e}"
+        error = 1002
+        return answer, error
+        
+        
 #-----------------------------------------
 # GPT를 이용한 text 생성2 
 # => 아래 1번 함수와 차이점은 timeout(초)를 설정할수 있음.

@@ -13,9 +13,9 @@ EMBEDDING_MODEL: "bongsoo/kpf-sbert-128d-v1"
 VISION_MODEL: "../model/paligemma-3b-mix-448"
 VISION_DEVICE: "cuda:0"
 
-ES_URL: "https://xxx:xxxx"    # es 8.x 일때는 앞에 https:// 붙여줘야 함. 
-#ES_API_KEY: "bxxxx=="  # demo서버
-ES_API_KEY: "dxxxx=="  # gpu서버
+ES_URL: "https://x.x.x.x:9201"    # es 8.x 일때는 앞에 https:// 붙여줘야 함. 
+#ES_API_KEY: "b"  # demo서버
+ES_API_KEY: "d"  # gpu서버
 ES_INDEX_FILE_PATH: "./data/es_index/mpower10u_128d_1_keword.json"
 ES_BATCH_SIZE: 100
 ES_RAG_DOC_INDEX_NAME: "mpower10u_vector_doc"  # 1개 문서를 rag로 검색할때 인덱스명
@@ -33,18 +33,20 @@ RRF_BM25_WEIGTH : 0.8           # BM25 가중치(EMBED와 합쳐서 2가되어�
 RRF_EMBED_WEIGTH: 1.2           # EMBED 가중치
 
 # GPT 관련 설정 
-GPT_TOKEN: 'sk-None-xxxx'           # google 계정 openai key
-GPT_MODEL: "gpt-4o-mini" # 모델 종류 : gpt-4o-mini, text-davinci-003, gpt-3.5-turbo, gpt-4, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
+GPT_TOKEN: 'sk-'           # google 계정 openai key
+#GPT_MODEL: "gpt-4o-mini" # 모델 종류 : gpt-4o-mini, text-davinci-003, gpt-3.5-turbo, gpt-4, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
+GPT_MODEL: "mistral"
 CHATTING_ASSISTANCE_LEN: 4      # 채팅할때 이전 몇개까지 대화내용 저장해 둘지 설정
 GPT_MAX_TOKENS: 4096 # 토큰 수  (gpt 영어가 아닌 경우에는 최대값이 4096임=>이상 설정하면 400 Client Error: Bad Request for url: https://api.openai.com/v1/chat/completions 에러 나무로 주의)
 GPT_TEMPERATURE: 0.7 # temperature 0~2 범위 : 작을수록 정형화된 답변, 클수록 유연한 답변(2는 엉뚱한 답변을 하므로, 1.5정도가 좋은것 같음=기본값은=1)
 GPT_TOP_P: 0.2 # 기본값은 1 (0.1이라고 하면 10% 토큰들에서 출력 토큰들을 선택한다는 의미)
 GPT_STREAM: True
 
-SYSTEM_PROMPT: "" # "답은 2줄로 요약해주세요."           # 시스템 프롬프트
-PROMPT_CONTEXT: "다음 검색된 내용을 가지고 질문에 답하십시오.\n최대 3개의 문장을 사용하고 간결하게 답변하세요.\n내용:{context}\nQ: {query}\nA:"
+SYSTEM_PROMPT: "" # "답은 한국어로 답변해 주세요.", "답은 2줄로 요약해주세요."           # 시스템 프롬프트
+#PROMPT_CONTEXT: "다음 검색된 내용을 가지고 질문에 답하십시오.\n최대 3개의 문장을 사용하고 간결하게 답변하세요.\n내용:{context}\nQ: {query}\nA:"
+PROMPT_CONTEXT: "Answer the question using the following searched content.\nUse up to 3 sentences and answer concisely.\nPlease answer in Korean.\nContent:{context}\nQ: {query}\nA:"
 
-RAG_PROMPT_CONTEXT: "You are an assistant for question-answering tasks.\nUse the following pieces of retrieved context to answer the question.\nIf you don't know the answer,just say that you don't know.\nUse three sentences maximum and keep the answer concise.\nQuestion: {query}\nContext: {context}\nAnswer:"
+RAG_PROMPT_CONTEXT: "You are an assistant for question-answering tasks.\nUse the following pieces of retrieved context to answer the question.\nIf you don't know the answer,just say that you don't know.\nUse three sentences maximum and keep the answer concise.\nPlease answer in Korean.\nQuestion: {query}\nContext: {context}\nAnswer:"
 
 # 출처 : pwoc517/polite_honorific_korean
 QA_PROMPT_CONTEXT: 'You use polite, honorific Korean ("존댓말") when conversing with users.\nMaintain a friendly and respectful tone throughout the conversation.\nPlease respond using polite honorific expressions such as "~습니다", "~니다", "반말"이나 "해요체"\n<Question>: {query}'
