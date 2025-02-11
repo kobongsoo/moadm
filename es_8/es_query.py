@@ -42,13 +42,10 @@ def make_bm25_query_script(query:str, user_id:str=None)->str:
  
 ############################################################
 ## 임베딩 쿼리 스크립트 만들기
+# => 문서당 1개 (평균)벡터와 쿼리 1개 백터를 1:1 비교
 ############################################################
 def make_embedding_query_script(qr_vector, user_id:str=None, uid_list:list=None)->str:
     
-    # 문단별 10개의 벡터와 쿼리벡터를 서로 비교하여 최대값 갖는 문단들중 가장 유사한  문단 출력
-    # => script """ 안에 코드는 java 임.
-    # => "queryVectorMag": 0.1905 일때 100% 일치하는 값은 9.98임(즉 10점 만점임)
-
     # uid_list가 있는 경우에는 해당하는 목록만 검색함
     if uid_list:
         query = { "bool" :{ "must": [ { "terms": { "rfile_name": uid_list } } ] } }
