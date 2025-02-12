@@ -49,9 +49,10 @@ sh moadm.sh start
 
 3. 탐지폴더에 있는 PPT 클릭(*탐지는 PPT 만됨)
 4. 잠시후 아래처럼 Assistanct 화면이 나옴.
-![image](https://github.com/user-attachments/assets/5c9c6383-532d-4393-b1c2-af64ca53f2c6)
+![image](https://github.com/user-attachments/assets/485bbb13-b7a0-4524-915c-f2316debf4a3)
 
 5. [chat] 버튼 클릭하면 열린 문서에 대한 Q&A 할수 있음.
 
-![image](https://github.com/user-attachments/assets/7de281a9-9c0c-4d3b-9944-e0f78a6866d6)
+![image](https://github.com/user-attachments/assets/5717dcc9-7264-422f-8987-5b5c497b2808)
+
 
