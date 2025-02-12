@@ -1,0 +1,42 @@
+elasticsearch 8.x dense vector 필드 타입 매개변수
+ 
+type(기본=int8_hnsw)
+KNN 알고리즘 유형 (HNSW만 지원)
+
+m(기본=16)
+hnsw 그래프에서 각 노드가 연결된 근접 이웃 수. 기본값은 16으로 숫자가 클 수록 색인 속도가 느려지지만 정확도는 상승
+
+ef_construction(기본=100)
+최근접 이웃의 목록을 조합하는데 추적할 후보 수. 기본값은 100, 숫자가 클 수록 검색 속도가 느려지지만 정확도는 상승
+
+dims
+벡터 차원수 2048을 초과할 수 없음
+
+index
+필드를 검색 할 지에 대한 여부(기본=true)
+
+
+similarity(기본=cosine)
+KNN에서 사용할 vector 유사도 메트릭 (l2_norm, dot_product, cosine) 사용 가능
+
+
+          PUT car-master.static.dense_vector
+          {
+            "mappings": {
+              "properties": { 
+                "vector_value": {
+                  "type": "dense_vector",
+                  "dims": 3,
+                  "index": true,
+                  "similarity": "l2_norm",
+                   "index_options": {
+                    "type": "int8_hnsw",
+                    "m": 1,
+                    "ef_construction": 2
+                  }
+                }
+              }
+            }
+          }
+
+출처: https://jaimemin.tistory.com/2519 [꾸준함:티스토리]
