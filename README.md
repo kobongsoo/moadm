@@ -40,12 +40,14 @@ sh moadm.sh start
 
 ## 테스트 
 
-1. webtest.exe 구동
+1. webtest.exe 구동 (test/webtest.zip 압축해제 후 실행)
 2. 인덱스명, 탐지폴더, 분류폴더 등 설정
-
+- 탐지폴더: 검색할 문서가 있는 폴더
+- 분류폴더: 검색 대상이 될 문서가 있는 폴더 (*이미 벡터 인덱싱되어 있는 문서들이 있는 폴더)
+  
 ![image](https://github.com/user-attachments/assets/99214168-81b4-442d-a96f-9bbf13106a14)
 
-3. 탐지폭더에 있는 PPT 클릭(*탐지는 PPT 만됨)
+3. 탐지폴더에 있는 PPT 클릭(*탐지는 PPT 만됨)
 4. 잠시후 아래처럼 Assistanct 화면이 나옴.
 ![image](https://github.com/user-attachments/assets/5c9c6383-532d-4393-b1c2-af64ca53f2c6)
 
