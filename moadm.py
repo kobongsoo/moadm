@@ -255,9 +255,10 @@ async def dm_search(Data:DocsSearchIn,
 # :파일업로드->text추출->평균vector생성->검색->검색결과 html로 리턴
 # 파일을 선택해서 업로드 하면 file_foloder 경로 + "/org" 폴더파일을 저장하고,
 # 이후 저장된 파일 text 추출후 file_foloder 경로 + "/extra" 폴더에 저장후, 임베딩 후 검색함.
+# 또한 업로드된 (문서)파일 text 추출된 내용은 elasticsearch로 신규 인덱스 만들어서 인덱싱되고, 이는 RAG 채팅에 사용됨.
 #
 # => post: /upload/es/{인덱스명}/search
-# -in: esindex = 임베딩할 인덱스 명칭
+# -in: esindex = (문서)내용을 임베딩할 인덱스 명칭.
 # -in: file: UploadFile = File(...) : 업로드되는 파일
 # -in: file_type = 0,1만 입력=>0=신규문서(query_rfile=문서내용 입력됨) 1=기존문서(query_rfile=rfile_name 명 입력됨)
 # -in: search_k : 검색수(몇개까지 검색할지)
