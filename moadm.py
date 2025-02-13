@@ -260,7 +260,7 @@ async def dm_search(Data:DocsSearchIn,
 # => post: /upload/es/{인덱스명}/search
 # -in: esindex = (문서)내용을 임베딩할 인덱스 명칭.
 # -in: file: UploadFile = File(...) : 업로드되는 파일
-# -in: file_type = 0,1만 입력=>0=신규문서(query_rfile=문서내용 입력됨) 1=기존문서(query_rfile=rfile_name 명 입력됨)
+# -in: file_type = 0,1만 입력=>0=신규문서(search_docg 호출시 검색할 문서 text 추출된 파일 경로가 입력됨), 1=기존벡문서(기존 인덱싱된 rfile_name 명 입력됨)
 # -in: search_k : 검색수(몇개까지 검색할지)
 # -in: search_method : 검색방식(0=vector 검색, 1=vector+bm25 검색, 2=bm25검색)
 # -in: local_folder_path : 로컬파일이 있는 경로..
@@ -270,7 +270,7 @@ async def dm_search(Data:DocsSearchIn,
 async def dm_upload_search(request: Request,
                            file: UploadFile = File(...), 
                            esindex:str="mpower10u_vector",
-                           file_type:int=0,               # 0,1만 입력=>0=신규문서(query_rfile=문서내용 입력됨) 1=기존문서(query_rfile=rfile_name 명 입력됨)
+                           file_type:int=0,               # 0,1만 입력=>0=신규문서, 1=기존문서
                            search_k:int=Query(..., gt=0), # ... 는 필수 입력 이고, gt=0은 0보다 커야 한다. 작으면 422 Unprocessable Entity 응답반환됨
                            search_method:int=0,           # 검색방식(0=vector 검색, 1=vector+bm25 검색, 2=bm25검색)
                            save_folder_path:str="./dm_tmp/upload", # 임시파일이 저장될 root 폴더 경로.
